@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "userName": "Kenpachi",
+    "firstName": "Zaraki",
+    "middleName": "N/A",
+    "lastName": "Kenpachi",
+    "email": "kenpachizaraki@gmail.com",
+    "walletId": 1,
+    "walletBalance": 0,
+    "createdAt": "2025-12-31T14:05:04.866127",
+    "updatedAt": "2025-12-31T14:05:04.866127"
+  },
+  {
+    "id": 6,
+    "userName": "Kamala",
+    "firstName": "Camille",
+    "middleName": "Quinn",
+    "lastName": "Ondra",
+    "email": "camille@gmail.com",
+    "walletId": 6,
+    "walletBalance": 2000,
+    "createdAt": "2026-01-04T04:31:03",
+    "updatedAt": "2026-01-04T04:31:03"
+  },
+  {
+    "id": 4,
+    "userName": "ClinCent",
+    "firstName": "Cliford Vincent",
+    "middleName": "Castro",
+    "lastName": "Gamit",
+    "email": "gamitclifordvincentc@gmail.com",
+    "walletId": 4,
+    "walletBalance": 3266,
+    "createdAt": "2025-12-16T00:06:42",
+    "updatedAt": "2025-12-16T00:06:42"
+  },
+  {
+    "id": 3,
+    "userName": "Shielamok",
+    "firstName": "Shiela Mae",
+    "middleName": "Castro",
+    "lastName": "Gamit",
+    "email": "shielamae.gamit@cvsu.edu.ph",
+    "walletId": 3,
+    "walletBalance": 5.5,
+    "createdAt": "2025-12-04T00:32:18",
+    "updatedAt": "2025-12-04T00:32:18"
+  },
+  {
+    "id": 5,
+    "userName": "Yobab",
+    "firstName": "Precious Mae ",
+    "middleName": "Castro",
+    "lastName": "Gamit",
+    "email": "preciousmae@gmail.com",
+    "walletId": 5,
+    "walletBalance": 86000,
+    "createdAt": "2025-12-26T13:29:31",
+    "updatedAt": "2025-12-26T13:29:31"
+  }
+]
