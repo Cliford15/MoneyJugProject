@@ -1,4 +1,3 @@
-// src/app/api/wallets/[walletId]/deposit/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
 const SPRING_WALLET_URL =
@@ -19,9 +18,12 @@ interface Params {
   walletId: string;
 }
 
-export async function POST(req: NextRequest, { params }: { params: Params }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<Params> } // <-- MUST be a Promise
+) {
   try {
-    const { walletId } = params;
+    const { walletId } = await params; // <-- await the promise
 
     // Parse request body safely
     const body: DepositRequest = (await req.json().catch(() => ({}))) as DepositRequest;
