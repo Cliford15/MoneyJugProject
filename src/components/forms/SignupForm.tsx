@@ -4,17 +4,39 @@ import React, { useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { createUser } from "@/services/UserService";
 
+interface UserFormData {
+  id: number | null;
+  userName: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  email: string;
+  walletId: number | null;
+  password: string;
+  isloggedin: boolean;
+}
+
+// Payload type sent to API
+interface UserPayload {
+  userName: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
 export default function Signup() {
-  const { users, setUsers} = useUser();
-  const [formData, setFormData] = useState({
+  const { users, setUsers } = useUser();
+  const [formData, setFormData] = useState<UserFormData>({
     id: null,
-    userName: '',
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    email: '',
+    userName: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    email: "",
     walletId: null,
-    password: '',
+    password: "",
     isloggedin: false,
   });
 
@@ -23,21 +45,36 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const payload: UserPayload = {
+      userName: formData.userName,
+      firstName: formData.firstName,
+      middleName: formData.middleName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+    };
+
     try {
-      const payload = {
-        userName: formData.userName,
-        firstName: formData.firstName,
-        middleName: formData.middleName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
-      };
       const res = await createUser(payload);
-      const created = res?.data ?? payload;
+      // Type the response
+      const created: UserFormData = res?.data ?? { ...formData, id: Date.now() };
+
       setUsers([...users, created]);
       alert("User signed up successfully!");
-      setFormData({id: null, userName: "", firstName: "", middleName: "", lastName: "", email: "", walletId: null, password: "", isloggedin: false});
-    } catch (err: any) {
+
+      setFormData({
+        id: null,
+        userName: "",
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        email: "",
+        walletId: null,
+        password: "",
+        isloggedin: false,
+      });
+    } catch (err) {
       console.error(err);
       alert("Failed to sign up user. See console for details.");
     }

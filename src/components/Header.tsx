@@ -5,6 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { IoPersonCircleOutline } from "react-icons/io5";
+import Image from "next/image";
 
 export default function Header() {
   const { currentUser, setCurrentUser } = useUser();
@@ -25,7 +26,7 @@ export default function Header() {
         } else if (data && data.userName) {
           setCurrentUser({ ...data, isloggedin: true });
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     })();
@@ -34,7 +35,7 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (e) {
+    } catch {
       // ignore
     }
     setCurrentUser(null);
@@ -52,7 +53,7 @@ export default function Header() {
     <header className="w-full h-20 bg-[#75DB55]">
       <div className="flex justify-between mx-[30px] h-full items-center text-sm">
         <div className="flex gap-[50px]">
-          <img src="/MoneyJugLogo.png" alt="Money Jug Logo" className="w-[123px]" />
+          <Image src="/MoneyJugLogo.png" alt="Money Jug Logo" height={63} width={123}/>
           <nav className="flex gap-[30px] items-center text-[#7E4228] font-montserrat font-semibold">
             <Link href="/">Home</Link>
             <Link href="/prototype">Prototype</Link>

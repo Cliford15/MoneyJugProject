@@ -2,6 +2,7 @@ type ActiveCollectionProps = {
     activeCollection: string;
 };
 
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { SavingsJug } from "@/types/SavingsJug";
@@ -84,7 +85,7 @@ export default function Collection({ activeCollection }: ActiveCollectionProps) 
                         <div className="flex flex-col items-center justify-center w-full h-full text-gray-400" />
                     ) : (
                         <div className="flex flex-col items-center justify-center w-full h-full text-white">
-                            <img
+                            <Image
                                 src={
                                     jug.designPath
                                         ? `/${jug.designPath}`
@@ -93,7 +94,8 @@ export default function Collection({ activeCollection }: ActiveCollectionProps) 
                                         : "/DefaultDesign.png"
                                 }
                                 alt={jug.name}
-                                className="h-[150px] w-[150px]"
+                                width={150}
+                                height={150}
                             />
                             <div className="h-[30px] w-full bg-black/50 rounded-lg flex flex-col text-xs items-center justify-center text-center">
                                 <p className="truncate w-[100px] text-white">{jug.name}</p>

@@ -9,7 +9,7 @@ export interface SavingsJug {
     isFinished: boolean;
     walletId: number | null;
     designId: number | null;
-    designPath?: string;
+    designPath?: string | null | undefined;
     slot: number;
     set: boolean;
 }
