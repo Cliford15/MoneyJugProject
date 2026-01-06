@@ -1,21 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { UserInfo } from "@/types/UserInfo";
 
 const dataFile = path.join(process.cwd(), "data", "users.json");
 const SPRING_VERIFY_URL =
   process.env.SPRING_VERIFY_URL || "http://localhost:8080/auth/login";
-
-// Define a proper User type
-interface User {
-  id?: number;
-  userName: string;
-  firstName?: string;
-  middleName?: string;
-  lastName?: string;
-  email?: string;
-  [key: string]: any; // fallback for extra fields from API
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,15 +33,23 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Upstream error", details: t }, { status: 502 });
       }
 
-      // Use proper User type
-      const user: User | null = await res.json().catch(() => null);
-
-      // persist locally (optional)
+      // Use UserInfo (partial) instead of any
+      let user: Partial<UserInfo> | null = null;
       try {
-        let users: User[] = [];
+        const data = await res.json();
+        if (data && typeof data === "object" && "userName" in data) {
+          user = data as Partial<UserInfo>; // Partial because not all fields may be returned
+        }
+      } catch {
+        user = null;
+      }
+
+      // persist locally
+      try {
+        let users: Partial<UserInfo>[] = [];
         try {
           const text = await fs.readFile(dataFile, "utf8");
-          users = JSON.parse(text || "[]") as User[];
+          users = JSON.parse(text || "[]") as Partial<UserInfo>[];
         } catch {
           await fs.mkdir(path.dirname(dataFile), { recursive: true });
           await fs.writeFile(dataFile, "[]");
@@ -59,11 +57,11 @@ export async function POST(req: NextRequest) {
         }
 
         if (user) {
-          users = users.filter(u => u.userName !== user.userName).concat(user);
+          users = users.filter(u => u.userName !== user?.userName).concat(user);
         }
 
         await fs.writeFile(dataFile, JSON.stringify(users, null, 2));
-      } catch (e) {
+      } catch (e: unknown) {
         console.error("Failed to persist locally", e);
       }
 
@@ -72,16 +70,16 @@ export async function POST(req: NextRequest) {
       if (user?.userName) {
         nextRes.cookies.set("currentUser", String(user.userName), {
           path: "/",
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 60 * 60 * 24 * 7,
         });
       }
 
       return nextRes;
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error contacting Spring verify endpoint", err);
       return NextResponse.json({ error: "Upstream request failed" }, { status: 502 });
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error(err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

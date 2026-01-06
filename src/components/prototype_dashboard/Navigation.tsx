@@ -1,6 +1,6 @@
 interface ChildProps {
   onButtonClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  activeCollection: String;
+  activeCollection: string;
 }
 
 export default function Navigation({ onButtonClick, activeCollection }: ChildProps){

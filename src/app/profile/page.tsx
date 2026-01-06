@@ -5,7 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 
 export default function Profile(){
-    const { currentUser, setCurrentUser, users, setUsers, walletBalance } = useUser();
+    const { currentUser, setCurrentUser, setUsers, walletBalance } = useUser();
     const router = useRouter();
 
     const handleLogout = () => {

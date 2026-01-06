@@ -1,19 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { UserInfo } from "@/types/UserInfo"; // import your type
 
 const dataFile = path.join(process.cwd(), "data", "users.json");
-
-// Define proper User type
-interface User {
-  id?: number;
-  userName: string;
-  firstName?: string;
-  middleName?: string;
-  lastName?: string;
-  email?: string;
-  [key: string]: any; // fallback for extra fields
-}
 
 // Utility to read a cookie
 function getCookieValue(cookieHeader: string | null, name: string): string | null {
@@ -39,7 +29,7 @@ export async function GET(req: NextRequest) {
 
     try {
       const text = await fs.readFile(dataFile, "utf8");
-      const users: User[] = JSON.parse(text || "[]");
+      const users: UserInfo[] = JSON.parse(text || "[]");
 
       const user = users.find(u => String(u.userName) === current) ?? null;
 
