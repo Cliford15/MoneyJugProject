@@ -1,24 +1,26 @@
-// src/app/api/savings/[id]/deposit/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
 const SPRING_SAVINGS_URL =
   process.env.SPRING_SAVINGS_URL || "http://localhost:8080/api/savings";
 
-// Define a type for the request body
+// Request body type
 interface DepositBody {
   amount?: string | number;
 }
 
-// Type for the POST params
+// POST params type for App Router
 interface Params {
   id: string;
 }
 
-export async function POST(req: NextRequest, { params }: { params: Params }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<Params> } // <--- use Promise here
+) {
   try {
-    const { id } = params;
+    const { id } = await params; // <--- await the promise
 
-    // Safely parse request JSON
+    // Parse request body safely
     const body: DepositBody = (await req.json().catch(() => ({}))) as DepositBody;
 
     // Get amount from body or query string
@@ -33,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
 
-    // Call the Spring Boot deposit endpoint
+    // Call Spring Boot deposit endpoint
     const res = await fetch(
       `${SPRING_SAVINGS_URL}/${id}/deposit?amount=${encodeURIComponent(
         String(numericAmount)
@@ -51,9 +53,6 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
     }
   } catch (err) {
     console.error("Error in savings deposit POST:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
