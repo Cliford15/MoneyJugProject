@@ -16,14 +16,15 @@ export default function Prototype(){
     }
 
     return(
-        <div className="w-full h-screen flex">
+        <div className="w-full h-[110vh] flex bg-[#1F2A44]">
             <Navigation onButtonClick={handleActiveCollection} activeCollection={activeCollection}/>
-
+            
             <div className="bg-[url('/Shelf.png')] bg-cover bg-center h-screen w-full">
                 <Savings activeCollection={activeCollection}/>
                 <Collection activeCollection={activeCollection}/>
                 <Broken activeCollection={activeCollection}/>
             </div>
+            
 
             <Transaction />
         </div>

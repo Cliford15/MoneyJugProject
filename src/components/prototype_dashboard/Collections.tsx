@@ -1,5 +1,7 @@
+"use client";
+
 type ActiveCollectionProps = {
-    activeCollection: string;
+  activeCollection: string;
 };
 
 import Image from "next/image";
@@ -7,106 +9,104 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { SavingsJug } from "@/types/SavingsJug";
 
+const ITEMS_PER_PAGE = 12;
+
 export default function Collection({ activeCollection }: ActiveCollectionProps) {
-    const { currentUser } = useUser();
-    const [items, setItems] = useState<SavingsJug[]>([]);
+  const { currentUser } = useUser();
+  const [items, setItems] = useState<SavingsJug[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
-    useEffect(() => {
-        (async () => {
-            if (!currentUser || !currentUser.walletId) {
-                setItems([]);
-                return;
-            }
+  useEffect(() => {
+    (async () => {
+      if (!currentUser?.walletId) {
+        setItems([]);
+        return;
+      }
 
-            try {
-                const res = await fetch(`/api/savings?walletId=${currentUser.walletId}`);
-                if (!res.ok) return;
+      try {
+        const res = await fetch(`/api/savings?walletId=${currentUser.walletId}`);
+        if (!res.ok) return;
 
-                const list = await res.json();
-                const arr = Array.isArray(list)
-                    ? list
-                    : Array.isArray(list.result)
-                    ? list.result
-                    : [];
+        const list = await res.json();
+        const arr: SavingsJug[] = Array.isArray(list)
+          ? list
+          : Array.isArray(list.result)
+          ? list.result
+          : [];
 
-                setItems(arr.filter((s: SavingsJug) => s.isFinished));
-            } catch (e) {
-                console.error(e);
-            }
-        })();
-    }, [currentUser]);
+        setItems(arr.filter((s) => s.isFinished));
+        setCurrentPage(1); // reset page on reload
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [currentUser]);
 
-    /**
-     * Create 12 empty gallery slots
-     * NOTE: optional fields use `undefined`, NOT null
-     */
-    const slots: SavingsJug[] = Array.from({ length: 12 }, (_, i) => ({
-        id: null,
-        name: "",
-        currentAmount: 0,
-        goalAmount: 0,
-        isBroken: false,
-        isFinished: true,
-        walletId: currentUser?.walletId ?? null,
-        designId: null,
-        designPath: undefined, // ✅ FIX HERE
-        slot: i + 1,
-        set: false,
-    }));
+  // Pagination logic
+  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-    /**
-     * Fill slots sequentially (ignore original slot)
-     */
-    items.slice(0, slots.length).forEach((it, index) => {
-        if (!slots[index]) return;
+  return (
+    <div
+      className={`w-full h-full text-2xl text-[#6C5321] pt-4
+        ${activeCollection === "collections" ? "block" : "hidden"}`}
+    >
+      {/* Jugs */}
+      <div className="flex flex-wrap items-start justify-start">
+        {paginatedItems.map((jug, index) => (
+          <div
+            key={jug.id ?? index}
+            className="flex justify-center items-center h-[180px] mt-[20px] w-[150px] mx-[15px] rounded-xl"
+          >
+            <div className="flex flex-col items-center justify-center w-full h-full text-white">
+              <Image
+                src={
+                  jug.designPath
+                    ? `/${jug.designPath}`
+                    : jug.designId
+                    ? `/${jug.designId}`
+                    : "/DefaultDesign.png"
+                }
+                alt={jug.name}
+                width={150}
+                height={150}
+              />
+              <div className="h-[30px] w-full bg-black/50 rounded-lg flex flex-col text-xs items-center justify-center text-center">
+                <p className="truncate w-[100px] text-white">{jug.name}</p>
+                <p className="truncate w-[100px] text-white">
+                  {jug.currentAmount}/{jug.goalAmount}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        slots[index] = {
-            ...slots[index],
-            ...it,
-            set: true,
-        };
-    });
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+            className="px-4 py-2 rounded-lg bg-black/20 disabled:opacity-40"
+          >
+            Prev
+          </button>
 
-    return (
-        <div
-            className={`w-full h-full flex flex-wrap items-start justify-start text-2xl text-[#6C5321] pt-4
-            ${activeCollection === "collections" ? "block" : "hidden"}`}
-        >
-            {slots.map((jug) => (
-                <div
-                    key={jug.id ?? `collection-slot-${jug.slot}`}
-                    className={`flex justify-center items-center ${
-                        !jug.set
-                            ? "h-[150px] mb-[40px] mt-[20px] bg-black/10"
-                            : "h-[180px] mt-[20px]"
-                    } w-[150px] mx-[15px] rounded-xl`}
-                >
-                    {!jug.set ? (
-                        <div className="flex flex-col items-center justify-center w-full h-full text-gray-400" />
-                    ) : (
-                        <div className="flex flex-col items-center justify-center w-full h-full text-white">
-                            <Image
-                                src={
-                                    jug.designPath
-                                        ? `/${jug.designPath}`
-                                        : jug.designId
-                                        ? `/${jug.designId}`
-                                        : "/DefaultDesign.png"
-                                }
-                                alt={jug.name}
-                                width={150}
-                                height={150}
-                            />
-                            <div className="h-[30px] w-full bg-black/50 rounded-lg flex flex-col text-xs items-center justify-center text-center">
-                                <p className="truncate w-[100px] text-white">{jug.name}</p>
-                                <p className="truncate w-[100px] text-white">
-                                    {jug.currentAmount}/{jug.goalAmount}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            ))}
+          <span className="text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+            className="px-4 py-2 rounded-lg bg-black/20 disabled:opacity-40"
+          >
+            Next
+          </button>
         </div>
-    );
+      )}
+    </div>
+  );
 }
